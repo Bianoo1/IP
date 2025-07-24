@@ -1,0 +1,32 @@
+name: 每日定时下载 ZIP 并提交
+
+on:
+  schedule:
+    # UTC 时间每天1点执行（北京时间9点）
+    - cron: '1 1 * * *'
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  download_and_commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 签出仓库代码
+        uses: actions/checkout@v3
+
+      - name: 下载 ZIP 文件
+        run: |
+          curl -L -o daily.zip https://zip.cm.edu.kg
+          ls -lh daily.zip
+          file daily.zip
+
+      - name: 配置 Git 用户信息
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: 添加并提交 ZIP 文件
+        run: |
+          git add daily.zip
+          git commit -m "每日自动下载 zip 文件 $(date +'%Y-%m-%d')" || echo "无变化，跳过提交"
+          git push

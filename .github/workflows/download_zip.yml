@@ -1,9 +1,9 @@
-name: 每日定时下载 ZIP 并提交
+name: 每日下载 ip.zip 并提交
 
 on:
   schedule:
-    - cron: '1 1 * * *'
-  workflow_dispatch:
+    - cron: '0 1 * * *'  # 每天北京时间 9 点
+  workflow_dispatch:      # 支持手动触发
 
 jobs:
   download_and_commit:
@@ -13,27 +13,27 @@ jobs:
       - name: 签出仓库代码
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # 关闭默认token，改用PAT
+          persist-credentials: false  # 禁用默认 GitHub Token
 
-      - name: 下载 ZIP 文件
+      - name: 下载 ip.zip 文件
         run: |
-          curl -L -o daily.zip https://zip.cm.edu.kg
-          ls -lh daily.zip
-          file daily.zip
+          curl -L -O https://zip.cm.edu.kg/ip.zip
+          file ip.zip
+          ls -lh ip.zip
 
       - name: 配置 Git 用户信息
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: 添加并提交 ZIP 文件
+      - name: 添加并提交 ip.zip
         run: |
-          git add daily.zip
-          git commit -m "每日自动下载 zip 文件 $(date +'%Y-%m-%d')" || echo "无变化，跳过提交"
+          git add ip.zip
+          git commit -m "自动下载 ip.zip：$(date +'%Y-%m-%d')" || echo "无变化，跳过提交"
 
-      - name: 使用 PAT 推送代码
+      - name: 使用 PAT 推送提交
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/Bianoo1/IP.git
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}
           git push

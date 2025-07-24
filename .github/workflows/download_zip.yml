@@ -13,7 +13,7 @@ jobs:
       - name: 签出仓库代码
         uses: actions/checkout@v3
         with:
-          persist-credentials: true  # 允许后续 git push 使用 token
+          persist-credentials: false  # 关闭默认token，改用PAT
 
       - name: 下载 ZIP 文件
         run: |
@@ -30,4 +30,10 @@ jobs:
         run: |
           git add daily.zip
           git commit -m "每日自动下载 zip 文件 $(date +'%Y-%m-%d')" || echo "无变化，跳过提交"
+
+      - name: 使用 PAT 推送代码
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/Bianoo1/IP.git
           git push

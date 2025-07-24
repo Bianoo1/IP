@@ -2,9 +2,8 @@ name: 每日定时下载 ZIP 并提交
 
 on:
   schedule:
-    # UTC 时间每天1点执行（北京时间9点）
     - cron: '1 1 * * *'
-  workflow_dispatch:  # 支持手动触发
+  workflow_dispatch:
 
 jobs:
   download_and_commit:
@@ -13,6 +12,8 @@ jobs:
     steps:
       - name: 签出仓库代码
         uses: actions/checkout@v3
+        with:
+          persist-credentials: true  # 允许后续 git push 使用 token
 
       - name: 下载 ZIP 文件
         run: |

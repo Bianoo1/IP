@@ -2,7 +2,7 @@ name: 每日下载 ip.zip 并提交
 
 on:
   schedule:
-    - cron: '0 1 * * *'   # 每天 UTC+0 的 1 点，对应北京时间早上 9 点
+    - cron: '0 1 * * *'   # 每天 UTC+0 的 1 点，对应北京时间 9 点
   workflow_dispatch:       # 手动触发支持
 
 jobs:
@@ -13,14 +13,14 @@ jobs:
       - name: 签出仓库代码
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # 使用自定义 PAT Token
+          persist-credentials: false  # 使用 PAT Token 推送
 
-      - name: 下载 ip.zip 文件
+      - name: 使用 wget 下载 ip.zip
         run: |
-          curl -L -O -A "Mozilla/5.0" https://zip.cm.edu.kg/ip.zip
+          wget --no-check-certificate --user-agent="Mozilla/5.0" https://zip.cm.edu.kg/ip.zip
           echo "检查文件类型:"
           file ip.zip
-          echo "文件内容预览（前几行）:"
+          echo "文件内容预览:"
           head -n 10 ip.zip
 
       - name: 配置 Git 用户信息

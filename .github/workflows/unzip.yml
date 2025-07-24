@@ -28,7 +28,7 @@ jobs:
           # 遍历所有解压文件夹中的.txt文件
           find . -name "*.txt" | while read txtfile; do
             folder=$(dirname "$txtfile" | xargs basename)
-            filename=$(basename "$txtfile")
+            filename=$(basename "$txtfile" .txt)  # 移除.txt后缀
             # 只为非空行添加":X#Y"格式的字符串
             sed -i '/^$/! s|$|:'"$folder"'#'"$filename"'|' "$txtfile"
           done
@@ -41,5 +41,5 @@ jobs:
       - name: 提交更改
         run: |
           git add .
-          git commit -m "解压并处理文本文件：为非空行添加文件夹和文件名标记" || echo "无变更"
+          git commit -m "解压并处理文本文件：为非空行添加文件夹和文件名标记(不含后缀)" || echo "无变更"
           git push

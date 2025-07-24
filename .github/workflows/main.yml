@@ -1,0 +1,26 @@
+name: 每日定时下载 ZIP
+
+on:
+  schedule:
+    # 每天9点触发，时间为 UTC（北京时间 +8小时）
+    - cron: '1 1 * * *'  # 北京时间9点是UTC的1点，1点执行任务
+
+jobs:
+  download_zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 签出仓库
+        uses: actions/checkout@v3
+
+      - name: 下载 ZIP 文件
+        run: |
+          curl -L -o daily.zip https://zip.cm.edu.kg
+
+      - name: 提交下载的 ZIP 文件
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add daily.zip
+          git commit -m "每日自动下载 zip 文件 $(date +'%Y-%m-%d') " || echo "无更新"
+          git push

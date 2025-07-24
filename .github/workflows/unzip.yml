@@ -14,10 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: 解压 ZIP
+      - name: 解压 ZIP 并删除 ZIP 文件
         run: |
           for file in *.zip; do
-            unzip -o "$file" -d "${file%.*}"
+            folder="${file%.*}"
+            mkdir -p "$folder"
+            unzip -o "$file" -d "$folder"
+            rm "$file"
           done
 
       - name: 配置 Git 身份
@@ -28,5 +31,5 @@ jobs:
       - name: 提交解压内容
         run: |
           git add .
-          git commit -m "自动解压 zip 并提交" || echo "无变更"
+          git commit -m "解压 zip 并提交（含删除原 zip）" || echo "无变更"
           git push

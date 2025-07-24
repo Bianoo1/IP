@@ -1,4 +1,4 @@
-name: 自动解压 ZIP 并提交
+name: 自动解压 ZIP 并处理文本
 
 permissions:
   contents: write
@@ -9,12 +9,12 @@ on:
       - '*.zip'
 
 jobs:
-  unzip:
+  unzip-and-process:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: 解压 ZIP 并删除 ZIP 文件
+      - name: 解压 ZIP 文件
         run: |
           for file in *.zip; do
             folder="${file%.*}"
@@ -23,13 +23,23 @@ jobs:
             rm "$file"
           done
 
+      - name: 处理文本文件（跳过空行）
+        run: |
+          # 遍历所有解压文件夹中的.txt文件
+          find . -name "*.txt" | while read txtfile; do
+            folder=$(dirname "$txtfile" | xargs basename)
+            filename=$(basename "$txtfile")
+            # 只为非空行添加":X#Y"格式的字符串
+            sed -i '/^$/! s|$|:'"$folder"'#'"$filename"'|' "$txtfile"
+          done
+
       - name: 配置 Git 身份
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: 提交解压内容
+      - name: 提交更改
         run: |
           git add .
-          git commit -m "解压 zip 并提交（含删除原 zip）" || echo "无变更"
+          git commit -m "解压并处理文本文件：为非空行添加文件夹和文件名标记" || echo "无变更"
           git push

@@ -1,9 +1,9 @@
-name: 每日下载 ip.zip 并提交
+name: 每两小时下载 ip.zip 并提交
 
 on:
   schedule:
-    - cron: '0 * * * *'   # 每小时 UTC 的第 0 分钟运行一次
-  workflow_dispatch:       # 手动触发支持
+    - cron: '0 */2 * * *'   # 每两个小时运行一次（UTC）
+  workflow_dispatch:         # 支持手动触发
 
 jobs:
   download_and_commit:
@@ -31,7 +31,7 @@ jobs:
       - name: 添加并提交 ip.zip
         run: |
           git add ip.zip
-          git commit -m "自动下载 ip.zip：$(date +'%Y-%m-%d')" || echo "无变化，跳过提交"
+          git commit -m "自动下载 ip.zip：$(date +'%Y-%m-%d %H:%M:%S')" || echo "无变化，跳过提交"
 
       - name: 使用 PAT Token 推送变更
         env:
